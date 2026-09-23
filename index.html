@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Premios Día del Profesor 2026 - Andino Montessori</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍎</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff8ee;--card:#fff;--ink:#3a2e1f;--sub:#7a6a52;--accent:#e8963a;--accent2:#d6672f;--line:#f0e2c8;--ok:#3f9d5e}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Nunito',-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);
+  background-image:radial-gradient(circle at 8% 12%, #ffe9c7 0%, transparent 40%),
+                    radial-gradient(circle at 92% 88%, #ffd9b0 0%, transparent 40%);
+  background-attachment:fixed}
+.wrap{max-width:560px;margin:0 auto;padding:0 18px 60px}
+.hero{background:linear-gradient(135deg,#e8963a,#d6672f);border-radius:0 0 28px 28px;
+  padding:38px 22px 30px;margin:0 -18px 26px;color:#fff;text-align:center;position:relative;overflow:hidden;
+  box-shadow:0 8px 24px rgba(214,103,47,.25)}
+.hero::before{content:"🍎 📚 ✏️ 🎓 🍎";position:absolute;top:-6px;left:0;right:0;font-size:1.1rem;opacity:.35;
+  letter-spacing:18px;white-space:nowrap;overflow:hidden}
+.hero-badge{display:inline-block;background:rgba(255,255,255,.22);border-radius:999px;padding:4px 14px;
+  font-size:.78rem;font-weight:700;letter-spacing:.5px;margin-bottom:10px}
+h1{font-family:'Fredoka',sans-serif;font-size:1.7rem;margin:0 0 6px;color:#fff;line-height:1.15}
+.hero .sub{color:#fff0dd;font-size:.92rem;margin:0}
+.sub{color:var(--sub);font-size:.92rem;margin-bottom:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px;
+  box-shadow:0 2px 10px rgba(58,46,31,.05)}
+label{display:block;font-weight:600;font-size:.9rem;margin-bottom:6px}
+.desc{color:var(--sub);font-size:.85rem;margin-bottom:8px}
+select,input{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:.95rem;margin-bottom:4px}
+label{font-family:'Fredoka',sans-serif}
+.cat-icon{font-size:1.3rem;margin-right:6px;vertical-align:middle}
+.cat-n{display:inline-block;background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;font-size:.75rem;font-weight:700;margin-right:6px}
+button{width:100%;padding:14px;border:none;border-radius:12px;background:var(--accent2);color:#fff;font-family:'Fredoka',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;margin-top:8px;box-shadow:0 4px 12px rgba(214,103,47,.25)}
+button:disabled{opacity:.5}
+button.secondary{background:transparent;color:var(--accent2);border:1px solid var(--accent2)}
+#progress{height:6px;background:var(--line);border-radius:3px;margin-bottom:22px;overflow:hidden}
+#bar{height:100%;background:var(--accent);width:0%;transition:width .2s}
+.msg{padding:14px;border-radius:12px;font-size:.9rem}
+.msg.err{background:#fce4e0;color:#8a2f1f}
+.center{text-align:center}
+.small{font-size:.8rem;color:var(--sub)}
+.hidden{display:none!important}
+.results-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:.88rem}
+.results-cat{font-weight:700;margin-top:14px;color:var(--accent2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-badge">16 DE OCTUBRE</div>
+    <h1>🏆 Premios Día del Profesor 2026</h1>
+    <p class="sub">Colegio Andino Montessori — Vota por quien más represente cada categoría</p>
+  </div>
+  <div id="progress"><div id="bar"></div></div>
+
+  <div id="step-voter" class="card">
+    <label>¿Quién eres?</label>
+    <div class="desc">Selecciona tu nombre para poder votar (un voto por persona).</div>
+    <select id="voterSelect"></select>
+    <div id="voterMsg"></div>
+    <button id="startBtn">Comenzar a votar</button>
+    <button class="secondary" id="adminBtn" style="margin-top:14px">Soy administradora</button>
+  </div>
+
+  <form id="voteForm" class="hidden"></form>
+
+  <div id="step-done" class="card hidden center">
+    <div style="font-size:2rem">🎉</div>
+    <h2>¡Gracias por votar!</h2>
+    <p class="small">Tu voto quedó registrado.</p>
+  </div>
+
+  <div id="results" class="card hidden"></div>
+</div>
+
+<script>
+// PEGA AQUÍ LA URL /exec DE TU APPS SCRIPT DESPLEGADO
+const WEBAPP_URL = "PEGA_TU_URL_EXEC_AQUI";
+
+const NOMBRES = [
+"Carolina Andrea Briceño Troncoso","Javiera Ivette Almuna Pallamare","Alexis Alejandro Herrera Diaz",
+"Alen Denisse Parra Moraga","Juana Inés Herrera Del Pino","Paulina Andrea Rojas Domínguez",
+"Richard Adrian Rodriguez","Daniela Valentina Díaz González","Bruno Jesús Weisser del Rio",
+"Luis Antonio Saez Saavedra","Madelein Constanza Villegas Maira","Juan Ignacio Vargas Ortiz",
+"Romina Teresa Matus Adrian","Maria Francisca Gaune Corradi","Silvana Antonella Mantelli Romeo",
+"María de los Angeles Alviña Torrealba","Rubén Orlando Fernández Beltran","Bárbara Silva Guerrero",
+"Nicole Andrea Rabba Masafierro","Eric Manuel Pezoa Campos","May Linng Chang Elgueta",
+"Francisca Monserrat Rojas Guíñez","Carlos Ernesto Donoso Pinto","Valentina Abigail Letelier Carreño",
+"Marisol Jacqueline Ortiz Cortés","Claudia Andrea Campos Rodríguez"
+];
+
+const CATEGORIAS = [
+["El alma de la fiesta","Siempre se suma a las celebraciones.","🎉"],
+["La mejor talla","Hace reír al equipo en el momento justo.","😂"],
+["Pies inquietos","Es el primero en salir a bailar.","💃"],
+["Yo me anoto","Participa en todas las actividades.","🙋"],
+["La voz de la calma","Ayuda a bajar las revoluciones.","🕊️"],
+["Ideas que brillan","Siempre aparece con una propuesta creativa.","💡"],
+["Compañero de oro","Está dispuesto a ayudar a los demás.","🤝"],
+["Energía infinita","Parece tener pilas para todo el día.","⚡"],
+["El mejor consejo","Siempre encuentra las palabras indicadas.","🦉"],
+["Estilo propio","Tiene un sello inconfundible al vestir.","✨"],
+["Organización nivel experto","Tiene todo bajo control.","🗂️"],
+["Corazón de profe","Destaca por su cariño y dedicación.","❤️"]
+];
+
+function opt(v,t){const o=document.createElement("option");o.value=v;o.textContent=t;return o;}
+
+function buildVoterSelect(){
+  const sel=document.getElementById("voterSelect");
+  sel.appendChild(opt("","Selecciona tu nombre..."));
+  NOMBRES.forEach(n=>sel.appendChild(opt(n,n)));
+}
+
+function buildForm(){
+  const form=document.getElementById("voteForm");
+  CATEGORIAS.forEach((c,i)=>{
+    const div=document.createElement("div");
+    div.className="card";
+    div.innerHTML=`<label><span class="cat-n">${i+1}</span><span class="cat-icon">${c[2]}</span>${c[0]}</label>
+      <div class="desc">${c[1]}</div>
+      <select data-cat="${c[0]}" required></select>`;
+    const sel=div.querySelector("select");
+    sel.appendChild(opt("","Elige una persona..."));
+    NOMBRES.forEach(n=>sel.appendChild(opt(n,n)));
+    sel.addEventListener("change", updateProgress);
+    form.appendChild(div);
+  });
+  const submitBtn=document.createElement("button");
+  submitBtn.type="submit";
+  submitBtn.textContent="Enviar mis votos 🗳️";
+  form.appendChild(submitBtn);
+}
+
+function updateProgress(){
+  const selects=[...document.querySelectorAll("#voteForm select")];
+  const filled=selects.filter(s=>s.value).length;
+  document.getElementById("bar").style.width=(filled/selects.length*100)+"%";
+}
+
+buildVoterSelect();
+buildForm();
+
+document.getElementById("startBtn").addEventListener("click", ()=>{
+  const voter=document.getElementById("voterSelect").value;
+  const msg=document.getElementById("voterMsg");
+  msg.innerHTML="";
+  if(!voter){ msg.innerHTML='<div class="msg err">Selecciona tu nombre primero.</div>'; return; }
+  document.getElementById("voteForm").dataset.voter=voter;
+  document.getElementById("step-voter").classList.add("hidden");
+  document.getElementById("voteForm").classList.remove("hidden");
+});
+
+document.getElementById("voteForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const voter=e.target.dataset.voter;
+  const selects=[...document.querySelectorAll("#voteForm select")];
+  const votos={};
+  let allFilled=true;
+  selects.forEach(s=>{ if(!s.value) allFilled=false; votos[s.dataset.cat]=s.value; });
+  if(!allFilled){ alert("Por favor completa todas las categorías."); return; }
+  const btn=e.target.querySelector("button[type=submit]");
+  btn.disabled=true; btn.textContent="Enviando...";
+  try{
+    const res=await fetch(WEBAPP_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({voter,votos})
+    });
+    const data=await res.json();
+    if(!data.ok){
+      if(data.error==="ya_voto"){ alert("Ya registramos tu voto anteriormente 🙏"); }
+      else{ alert("No se pudo guardar el voto. Intenta de nuevo."); }
+      btn.disabled=false; btn.textContent="Enviar mis votos 🗳️";
+      return;
+    }
+    document.getElementById("voteForm").classList.add("hidden");
+    document.getElementById("step-done").classList.remove("hidden");
+  }catch(err){
+    alert("No se pudo conectar. Revisa tu internet e intenta de nuevo.");
+    btn.disabled=false; btn.textContent="Enviar mis votos 🗳️";
+  }
+});
+
+document.getElementById("adminBtn").addEventListener("click", async ()=>{
+  const pass=prompt("Contraseña de administradora:");
+  if(!pass) return;
+  const panel=document.getElementById("results");
+  panel.classList.remove("hidden");
+  panel.innerHTML="Cargando...";
+  try{
+    const res=await fetch(WEBAPP_URL+"?action=results&password="+encodeURIComponent(pass));
+    const json=await res.json();
+    if(!json.ok){ panel.innerHTML='<div class="msg err">Contraseña incorrecta.</div>'; return; }
+    const rows=json.data;
+    const votantes=rows.map(r=>r["Votante"]);
+    const faltan=NOMBRES.filter(n=>!votantes.includes(n));
+    const counts={};
+    CATEGORIAS.forEach(c=>counts[c[0]]={});
+    rows.forEach(r=>{
+      CATEGORIAS.forEach(c=>{
+        const person=r[c[0]];
+        if(person){ counts[c[0]][person]=(counts[c[0]][person]||0)+1; }
+      });
+    });
+    let html=`<div class="small">Votaron ${rows.length} de ${NOMBRES.length}</div>`;
+    html+=`<div class="results-cat">Faltan por votar (${faltan.length})</div>`;
+    if(faltan.length===0){ html+='<div class="small">¡Todos votaron! 🎉</div>'; }
+    else{ faltan.forEach(n=>{ html+=`<div class="results-row"><span>${n}</span></div>`; }); }
+    CATEGORIAS.forEach(c=>{
+      const entries=Object.entries(counts[c[0]]).sort((a,b)=>b[1]-a[1]);
+      html+=`<div class="results-cat">🏆 ${c[0]}</div>`;
+      if(entries.length===0) html+='<div class="small">Sin votos aún</div>';
+      entries.forEach(([name,ct],idx)=>{
+        const crown = idx===0 && ct>0 ? "👑 " : "";
+        html+=`<div class="results-row"><span>${crown}${name}</span><span><b>${ct}</b></span></div>`;
+      });
+    });
+    panel.innerHTML=html;
+  }catch(err){
+    panel.innerHTML='<div class="msg err">No se pudo conectar con la base de datos.</div>';
+  }
+});
+</script>
+</body>
+</html>
